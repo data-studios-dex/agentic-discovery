@@ -1,0 +1,40 @@
+# Environments & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.pfx
+
+# Pipeline execution runs, outputs & reports
+runs/
+reports/
+*.log
+audit.jsonl
+state.json
+
+# Local databases
+sample/sample.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Distribution & build outputs
+dist/
+*.egg-info/
+*.zip
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

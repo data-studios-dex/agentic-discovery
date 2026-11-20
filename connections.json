@@ -1,0 +1,52 @@
+{
+  "sqlite_sample": {
+    "name": "sqlite_sample",
+    "description": "Local Retail & E-Commerce Demo Database (SQLite)",
+    "dialect": "sqlite",
+    "url": "sqlite:///sample/sample.db",
+    "schema": "main"
+  },
+  "postgres_dev": {
+    "name": "postgres_dev",
+    "description": "Development PostgreSQL CRM & Orders Database",
+    "dialect": "postgresql",
+    "host": "localhost",
+    "port": 5432,
+    "database": "crm_dev",
+    "username": "postgres",
+    "schema": "public",
+    "password_env_var": "POSTGRES_PASSWORD"
+  },
+  "snowflake_dw": {
+    "name": "snowflake_dw",
+    "description": "Enterprise Cloud Data Warehouse (Snowflake Template)",
+    "dialect": "snowflake",
+    "account": "xy12345.us-east-1",
+    "database": "ANALYTICS_DW",
+    "schema": "PUBLIC",
+    "username": "analytics_user",
+    "password_env_var": "SNOWFLAKE_PASSWORD"
+  },
+  "oracle_billing": {
+    "name": "oracle_billing",
+    "description": "Enterprise Billing & Accounting System (Oracle 19c Template)",
+    "dialect": "oracle",
+    "host": "localhost",
+    "port": 1521,
+    "service_name": "BILLING",
+    "username": "billing_user",
+    "schema": "BILLING_PROD",
+    "password_env_var": "ORACLE_PASSWORD"
+  },
+  "mysql_ecommerce": {
+    "name": "mysql_ecommerce",
+    "description": "E-Commerce Transactional Store (MySQL 8.0 Template)",
+    "dialect": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "database": "shop_db",
+    "username": "root",
+    "schema": "shop_db",
+    "password_env_var": "MYSQL_PASSWORD"
+  }
+}

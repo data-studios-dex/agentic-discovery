@@ -1,0 +1,76 @@
+{
+  "framework": "agentic_discovery",
+  "updated_at": "2026-11-20T05:03:01.952432+00:00",
+  "agents": {
+    "discovery_orchestrator": {
+      "status": "create",
+      "skill": "discovery_orchestrator",
+      "agent_id": "agent_472279a9b8d9a933",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:c8bf71b1173fd249bf1ea81b",
+      "updated_at": "2026-11-20T05:03:01.952321+00:00"
+    },
+    "db_discovery": {
+      "status": "create",
+      "skill": "db_discovery",
+      "agent_id": "agent_f5d5e5102e10242d",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:59dce217c621bee26c3c68dd",
+      "updated_at": "2026-11-20T05:03:01.952367+00:00"
+    },
+    "sql_profiler": {
+      "status": "create",
+      "skill": "sql_profiler",
+      "agent_id": "agent_3255ac63a8a1dc09",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:e7d0e09d1c9ddbdc4af8227a",
+      "updated_at": "2026-11-20T05:03:01.952384+00:00"
+    },
+    "dq_rulegen": {
+      "status": "create",
+      "skill": "dq_rulegen",
+      "agent_id": "agent_b926ad85bb6b8305",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:2796c0a55bc86d0ff9f4ea32",
+      "updated_at": "2026-11-20T05:03:01.952396+00:00"
+    },
+    "sql_validator_fixer": {
+      "status": "create",
+      "skill": "sql_validator_fixer",
+      "agent_id": "agent_a2255d18194892a0",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:4921e870f664f01bb9503115",
+      "updated_at": "2026-11-20T05:03:01.952407+00:00"
+    },
+    "governance_reviewer": {
+      "status": "create",
+      "skill": "governance_reviewer",
+      "agent_id": "agent_32bb7bf132933522",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:8b69bf7ac82d0fa3aad1cde2",
+      "updated_at": "2026-11-20T05:03:01.952416+00:00"
+    },
+    "governance_reporter": {
+      "status": "create",
+      "skill": "governance_reporter",
+      "agent_id": "agent_729612cd4abf86db",
+      "version": 1,
+      "model": "claude-sonnet-5-5",
+      "skill_version": "1.0.0",
+      "config_hash": "sha256:3933e6adcde4f2f916d77e69",
+      "updated_at": "2026-11-20T05:03:01.952427+00:00"
+    }
+  }
+}

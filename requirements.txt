@@ -1,0 +1,9 @@
+# Core dependencies for agentic-discovery
+rich>=13.7.0
+python-dotenv>=1.0.0
+
+# Optional SQLAlchemy engines for non-sqlite databases
+SQLAlchemy>=2.0.0
+
+# Optional LLM integration (for online Claude / Managed Agents)
+anthropic>=0.40.0
