@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "data-studios-dex",
+  "description": "Internal marketplace catalog for data engineering and data governance plugins",
+  "owner": {
+    "name": "Dev-Data&Insights Team",
+    "email": "dev-data-insights@ascendion.com"
+  },
+  "plugins": [
+    {
+      "name": "agentic-discovery",
+      "description": "Enterprise autonomous Database Discovery, Profiling, and Data Quality Governance framework powered by Claude Managed Agents and Gates G1-G6 (No MCP required).",
+      "author": {
+        "name": "Dev-Data&Insights Team",
+        "email": "dev-data-insights@ascendion.com"
+      },
+      "category": "development",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/data-studios-dex/agentic-discovery.git"
+      },
+      "homepage": "https://github.com/data-studios-dex/agentic-discovery"
+    }
+  ]
+}
