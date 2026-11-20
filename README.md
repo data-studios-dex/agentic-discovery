@@ -14,3 +14,34 @@ Packaged as a native **Claude Code Plugin** without requiring an external MCP se
 - **Full Auditing (S5)**: Comprehensive real-time telemetry, gate decisions, SQL execution log, and violation tallies stored in `audit.jsonl`.
 - **Claude-Themed Interactive Dashboard**: Executive health scoring, table triage, and interactive rule defect analysis.
 - **Strict Quality Gates (G1–G6)**: G1 Discovery ➔ G2 Profile SQL ➔ G3 Execution ➔ G4 DQ Assertions ➔ G5 Health Triage ➔ G6 Governance Deliverables.
+
+---
+
+## ⚡ Quick Install (No Cloning Required)
+
+Any member can install this plugin directly in Claude Code with **one single command** (zero git clone needed):
+
+```bash
+claude plugin install agentic-discovery --marketplace data-studios-dex/agentic-discovery
+```
+
+Or inside an active Claude Code interactive session:
+```text
+/plugin install agentic-discovery --marketplace data-studios-dex/agentic-discovery
+```
+
+Once installed, all slash commands and subagents are automatically available in every directory:
+- `/agentic-discovery:list-connections`
+- `/agentic-discovery:start`
+- `/agentic-discovery:ask "Show me health status of orders table"`
+
+---
+
+## 💻 Manual Clone / Local Development
+
+```bash
+git clone https://github.com/data-studios-dex/agentic-discovery.git
+cd agentic-discovery
+pip install -r requirements.txt
+python run.py --conn sqlite_sample
+```
