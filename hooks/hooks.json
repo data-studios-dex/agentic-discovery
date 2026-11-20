@@ -3,14 +3,12 @@
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "description": "Block destructive commands and enforce read-only database queries",
-        "command": "python hooks/sql_safety_guard.py"
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "*",
-        "description": "Log tool execution telemetry to audit.jsonl"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python hooks/sql_safety_guard.py"
+          }
+        ]
       }
     ]
   }
