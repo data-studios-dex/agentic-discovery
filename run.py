@@ -232,9 +232,9 @@ def run_interactive_qa_loop(qa_engine: DiscoveryQAEngine) -> None:
 
         ans = qa_engine.answer_question(user_q)
         if console:
-            console.print(Panel(ans, title=f"Q&A Analysis (Run: {qa_engine.run_id})", border_style="cyan"))
+            console.print(Panel(ans, title=f"🤖 DA_CL_Discovery_GovernanceReviewerAgent (Run: {qa_engine.run_id})", border_style="cyan"))
         else:
-            print(f"\n--- Answer (Run: {qa_engine.run_id}) ---")
+            print(f"\n--- 🤖 DA_CL_Discovery_GovernanceReviewerAgent (Run: {qa_engine.run_id}) ---")
             print(ans)
             print("-" * 40)
 
@@ -304,9 +304,9 @@ def main():
 
         ans = qa.answer_question(question_text)
         if console:
-            console.print(Panel(ans, title=f"Q&A Analysis (Run: {qa.run_id})", border_style="cyan"))
+            console.print(Panel(ans, title=f"🤖 DA_CL_Discovery_GovernanceReviewerAgent (Run: {qa.run_id})", border_style="cyan"))
         else:
-            print(f"\nQ&A Analysis (Run: {qa.run_id}):\n{ans}")
+            print(f"\n--- 🤖 DA_CL_Discovery_GovernanceReviewerAgent (Run: {qa.run_id}) ---\n{ans}")
         sys.exit(0)
 
     print_banner()

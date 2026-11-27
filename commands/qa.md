@@ -1,11 +1,16 @@
 ---
 name: qa
-description: Launch an interactive, continuous conversational Q&A session locked to a specific run ID (e.g. 20261127T104512_shop) or the latest run.
+description: Launch an interactive conversational Q&A session powered by the DA_CL_Discovery_GovernanceReviewerAgent.
 ---
 
 # /agentic-discovery:qa
 
-Launches an interactive natural language Q&A session where you can ask continuous questions about table health, data quality violations, schema architecture, and SQL remediation.
+Launches an interactive, continuous conversational Q&A session powered by **`DA_CL_Discovery_GovernanceReviewerAgent`** (subagent `agentic-discovery:governance-reviewer`).
+
+### Workflow
+1. Claude Code activates `agentic-discovery:governance-reviewer`.
+2. The agent loads the run context for the specified `run_id` (or latest run).
+3. The agent continuously responds to your natural language questions about table health, data quality violations, and SQL remediation.
 
 ### Syntax
 ```bash
@@ -14,10 +19,4 @@ Launches an interactive natural language Q&A session where you can ask continuou
 
 ### Examples
 - `/agentic-discovery:qa 20261127T104512_shop`
-- `/agentic-discovery:qa` (defaults to latest discovery run)
-
-### CLI Equivalent
-```bash
-python run.py qa 20261127T104512_shop
-python run.py qa
-```
+- `/agentic-discovery:qa`

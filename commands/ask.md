@@ -1,11 +1,16 @@
 ---
 name: ask
-description: Ask natural language questions about a specific discovery run (e.g. 20261127T104512_shop) or the latest run.
+description: Ask natural language questions about a discovery run answered by the DA_CL_Discovery_GovernanceReviewerAgent.
 ---
 
 # /agentic-discovery:ask
 
-Queries the discovery telemetry context using natural language. It interrogates the specified run's `state.json` and `audit.jsonl` to explain table health scores, defect details, schema architecture, and recommended SQL remediation scripts.
+Queries the discovery telemetry context using natural language. This command is executed by the **`DA_CL_Discovery_GovernanceReviewerAgent`** (subagent `agentic-discovery:governance-reviewer`).
+
+### Workflow
+1. Claude Code delegates this query to the subagent `agentic-discovery:governance-reviewer`.
+2. The agent inspects `runs/<run_id>/state.json` and `runs/<run_id>/audit.jsonl`.
+3. The agent analyzes table health scores, defect details, and recommends SQL remediation queries.
 
 ### Syntax
 ```bash
@@ -18,20 +23,4 @@ Queries the discovery telemetry context using natural language. It interrogates 
 - `/agentic-discovery:ask 20261127T104512_shop Why is the orders table marked DEGRADED?`
 - `/agentic-discovery:ask 20261127T104512_shop How to fix defects in table customers?`
 - `/agentic-discovery:ask Show all data quality violations`
-- `/agentic-discovery:ask Why is the orders table marked DEGRADED?`
-- `/agentic-discovery:ask How to fix defects in table customers?`
-- `/agentic-discovery:ask Show structure and columns of table products`
-- `/agentic-discovery:ask Show overall table health status and scores`
-
-### Interactive Mode
-To start a continuous interactive Q&A session on a specific run without typing the command repeatedly:
-```bash
-/agentic-discovery:qa 20261127T104512_shop
-```
-
-### CLI Equivalent
-```bash
-python run.py ask --run-id 20261127T104512_shop "Show all data quality violations"
-python run.py ask 20261127T104512_shop "Why is table orders DEGRADED?"
-python run.py qa 20261127T104512_shop
-```
+- `/agentic-discovery:ask How to fix defects in table orders?`
