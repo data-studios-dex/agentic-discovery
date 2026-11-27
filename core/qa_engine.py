@@ -30,7 +30,22 @@ class DiscoveryQAEngine:
         state_mgr = StateManager(self.run_id, self.base_dir)
         self.state_data = state_mgr.load() or {}
 
+        # Fallback to sibling workspace runs (e.g. agentic_dq/agentic_dq/runs/<run_id>)
+        if not self.state_data:
+            sibling_state = self.base_dir.parent / "agentic_dq" / "agentic_dq" / "runs" / self.run_id / "state.json"
+            if sibling_state.exists():
+                try:
+                    with open(sibling_state, "r", encoding="utf-8") as f:
+                        self.state_data = json.load(f)
+                except Exception:
+                    pass
+
         audit_file = self.base_dir / "runs" / self.run_id / "audit.jsonl"
+        if not audit_file.exists():
+            sibling_audit = self.base_dir.parent / "agentic_dq" / "agentic_dq" / "runs" / self.run_id / "audit.jsonl"
+            if sibling_audit.exists():
+                audit_file = sibling_audit
+
         if audit_file.exists():
             for line in audit_file.read_text(encoding="utf-8").splitlines():
                 if line.strip():
