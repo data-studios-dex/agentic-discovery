@@ -53,11 +53,33 @@ class StateManager:
 
     @classmethod
     def find_latest_run(cls, base_dir: Path) -> Optional[str]:
+        runs = cls.list_runs(base_dir)
+        return runs[0]["run_id"] if runs else None
+
+    @classmethod
+    def list_runs(cls, base_dir: Path) -> list[dict[str, Any]]:
         runs_dir = base_dir / "runs"
         if not runs_dir.exists():
-            return None
+            return []
         candidates = [p for p in runs_dir.iterdir() if p.is_dir() and (p / "state.json").exists()]
         if not candidates:
-            return None
-        latest = max(candidates, key=lambda p: (p / "state.json").stat().st_mtime)
-        return latest.name
+            return []
+        # Sort newest first
+        sorted_dirs = sorted(candidates, key=lambda p: (p / "state.json").stat().st_mtime, reverse=True)
+        results = []
+        for p in sorted_dirs:
+            try:
+                with open(p / "state.json", "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    results.append({
+                        "run_id": p.name,
+                        "timestamp": data.get("timestamp", ""),
+                        "last_gate": data.get("last_gate", ""),
+                        "dialect": (data.get("manifest") or {}).get("dialect", "unknown"),
+                        "schema": (data.get("manifest") or {}).get("schema_name", "main"),
+                        "table_count": len((data.get("manifest") or {}).get("tables", [])),
+                        "triages_count": len(data.get("triages", [])),
+                    })
+            except Exception:
+                results.append({"run_id": p.name, "timestamp": "", "last_gate": "", "dialect": "", "schema": "", "table_count": 0, "triages_count": 0})
+        return results

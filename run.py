@@ -241,7 +241,7 @@ def run_interactive_qa_loop(qa_engine: DiscoveryQAEngine) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Autonomous Database Discovery & Governance CLI")
-    parser.add_argument("command", nargs="?", default=None, choices=["start", "run", "list", "add", "ask", "provision", "check", "test"], help="Command shortcut")
+    parser.add_argument("command", nargs="?", default=None, choices=["start", "run", "list", "add", "ask", "qa", "provision", "check", "test"], help="Command shortcut")
     parser.add_argument("query", nargs="*", help="Natural language query string for ask command")
     parser.add_argument("--conn", type=str, default=None, help="Name of saved connection profile")
     parser.add_argument("--db-url", type=str, default=None, help="Direct database connection URL")
@@ -257,22 +257,54 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Preview provisioning plan without saving")
     parser.add_argument("--resume", action="store_true", help="Resume from latest checkpoint")
     parser.add_argument("--qa", action="store_true", help="Launch interactive conversational Q&A session after discovery completes")
+    parser.add_argument("--run-id", type=str, default=None, help="Target specific run ID for Q&A or reports (e.g. 20261127T104512_shop)")
 
     args = parser.parse_args()
 
-    # 1. NLP Ask Question Command
-    if args.command == "ask":
-        qa = DiscoveryQAEngine(ROOT_DIR)
-        question_text = " ".join(args.query).strip() if args.query else ""
-        if not question_text:
+    # 1. NLP Ask Question & Interactive QA Command
+    if args.command in ("ask", "qa"):
+        target_run_id = args.run_id
+        query_tokens = list(args.query) if args.query else []
+
+        # Check if first token in query is a specified run ID (e.g. `python run.py ask 20261127T104512_shop ...`)
+        if not target_run_id and query_tokens:
+            first_tok = query_tokens[0]
+            # Match if folder exists in runs/ or follows run_id timestamp pattern
+            if (ROOT_DIR / "runs" / first_tok).is_dir() or re.match(r"^\d{8}[_T]\w+$", first_tok):
+                target_run_id = first_tok
+                query_tokens = query_tokens[1:]
+
+        available_runs = StateManager.list_runs(ROOT_DIR)
+
+        # Interactive picker if run_id not provided and multiple runs exist
+        if not target_run_id:
+            if not available_runs:
+                print("No previous pipeline runs found in runs/. Run `python run.py start` first.")
+                sys.exit(1)
+            target_run_id = available_runs[0]["run_id"]
+
+        qa = DiscoveryQAEngine(ROOT_DIR, run_id=target_run_id)
+        question_text = " ".join(query_tokens).strip()
+
+        # If 'qa' command or no question passed, launch interactive Q&A loop
+        if args.command == "qa" or not question_text:
             print_banner()
-            question_text = prompt_user("Ask a question about your database discovery/quality run")
-        if not question_text:
+            if not args.run_id and len(available_runs) > 1 and not (args.query and args.query[0] == target_run_id):
+                if console:
+                    console.print("\n[bold #D97746]Available Discovery Runs:[/bold #D97746]")
+                    for idx, r in enumerate(available_runs[:5], 1):
+                        console.print(f"  [cyan]{idx})[/cyan] [bold]{r['run_id']}[/bold] [dim]({r['dialect'].upper()} / {r['schema']}, {r['table_count']} tables, {r['triages_count']} triaged)[/dim]")
+                    pick = prompt_user(f"Select Run ID (1-{min(len(available_runs), 5)}, default: 1 ({target_run_id}))", default="1")
+                    if pick.isdigit() and 1 <= int(pick) <= len(available_runs):
+                        target_run_id = available_runs[int(pick) - 1]["run_id"]
+                        qa = DiscoveryQAEngine(ROOT_DIR, run_id=target_run_id)
+
+            run_interactive_qa_loop(qa)
             sys.exit(0)
 
         ans = qa.answer_question(question_text)
         if console:
-            console.print(Panel(ans, title=f"Q&A Analysis (Run: {qa.run_id})", style="#D97746"))
+            console.print(Panel(ans, title=f"Q&A Analysis (Run: {qa.run_id})", border_style="cyan"))
         else:
             print(f"\nQ&A Analysis (Run: {qa.run_id}):\n{ans}")
         sys.exit(0)

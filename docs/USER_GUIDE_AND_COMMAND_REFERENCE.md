@@ -241,31 +241,47 @@ Executes discovery headless on a specific connection profile without interactive
 ---
 
 ### 5. `/agentic-discovery:ask`
-Queries the discovery telemetry context using natural language. It interrogates the generated `runs/<run_id>/state.json` and `audit.jsonl` to explain table health scores, defect details, schema architecture, and recommended SQL remediation scripts.
+Queries discovery telemetry and audit context using natural language for a specific run ID or the latest run.
 
-- **Post-Completion Live Q&A**:
-  When you execute `/agentic-discovery:start` (or `python run.py --conn <name> --qa`), the system **automatically initiates an interactive Q&A session** immediately after reports are generated. You can freely ask questions until you type `exit`.
+- **Syntax & Targeting Specific Run IDs**:
+  ```bash
+  /agentic-discovery:ask [run_id] [question]
+  /agentic-discovery:ask --run-id <run_id> [question]
+  ```
 
 - **Claude Code Examples:**
   ```text
-  /agentic-discovery:ask Show all data quality violations
-  /agentic-discovery:ask Why is the orders table marked DEGRADED?
-  /agentic-discovery:ask How to fix defects in table customers?
-  /agentic-discovery:ask Show columns and structure of table products
+  /agentic-discovery:ask 20261127T104512_shop Show all data quality violations
+  /agentic-discovery:ask 20261127T104512_shop Why is the orders table marked DEGRADED?
+  /agentic-discovery:ask 20261127T104512_shop How to fix defects in table customers?
+  /agentic-discovery:ask Show structure and columns of table products
   /agentic-discovery:ask Show overall table health scores
-  /agentic-discovery:ask Which columns have missing null values?
-  /agentic-discovery:ask Where are the report files saved?
   ```
 - **Terminal CLI:**
   ```bash
-  python run.py ask "Show all data quality violations"
-  python run.py ask "How to fix defects in table customers?"
-  python run.py --conn sqlite_sample --qa
+  python run.py ask 20261127T104512_shop "Show all data quality violations"
+  python run.py ask --run-id 20261127T104512_shop "Why is table orders DEGRADED?"
   ```
 
 ---
 
-### 6. `/agentic-discovery:test`
+### 6. `/agentic-discovery:qa`
+Launches a **continuous, interactive conversational Q&A session** locked directly onto a specific run ID (e.g. `20261127T104512_shop`).
+
+- **Claude Code:**
+  ```text
+  /agentic-discovery:qa 20261127T104512_shop
+  /agentic-discovery:qa
+  ```
+- **Terminal CLI:**
+  ```bash
+  python run.py qa 20261127T104512_shop
+  python run.py qa
+  ```
+
+---
+
+### 7. `/agentic-discovery:test`
 Executes the automated unit test suite and integration sanity checks to ensure drivers, SQL safety guards, and orchestrators are operational.
 
 - **Claude Code:**

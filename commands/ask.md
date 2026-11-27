@@ -1,32 +1,37 @@
 ---
 name: ask
-description: Ask natural language questions about the latest database discovery and data quality run (health triage, violation root causes, row counts, recommendations).
+description: Ask natural language questions about a specific discovery run (e.g. 20261127T104512_shop) or the latest run.
 ---
 
 # /agentic-discovery:ask
 
-Interactively answers user questions using the discovery and audit telemetry context.
+Queries the discovery telemetry context using natural language. It interrogates the specified run's `state.json` and `audit.jsonl` to explain table health scores, defect details, schema architecture, and recommended SQL remediation scripts.
 
 ### Syntax
 ```bash
-/agentic-discovery:ask [question]
+/agentic-discovery:ask [run_id] [question]
+/agentic-discovery:ask --run-id <run_id> [question]
 ```
 
 ### Examples
+- `/agentic-discovery:ask 20261127T104512_shop Show all data quality violations`
+- `/agentic-discovery:ask 20261127T104512_shop Why is the orders table marked DEGRADED?`
+- `/agentic-discovery:ask 20261127T104512_shop How to fix defects in table customers?`
 - `/agentic-discovery:ask Show all data quality violations`
 - `/agentic-discovery:ask Why is the orders table marked DEGRADED?`
 - `/agentic-discovery:ask How to fix defects in table customers?`
 - `/agentic-discovery:ask Show structure and columns of table products`
 - `/agentic-discovery:ask Show overall table health status and scores`
-- `/agentic-discovery:ask Are there any duplicate primary keys?`
-- `/agentic-discovery:ask Which columns have missing null values?`
-- `/agentic-discovery:ask Where are the report files saved?`
 
-### Interactive Post-Run Mode
-The Q&A session automatically activates after running `/agentic-discovery:start`, allowing you to ask questions in real-time right after the audit finishes.
+### Interactive Mode
+To start a continuous interactive Q&A session on a specific run without typing the command repeatedly:
+```bash
+/agentic-discovery:qa 20261127T104512_shop
+```
 
 ### CLI Equivalent
 ```bash
-python run.py ask "Show all data quality violations"
-python run.py --conn sqlite_sample --qa
+python run.py ask --run-id 20261127T104512_shop "Show all data quality violations"
+python run.py ask 20261127T104512_shop "Why is table orders DEGRADED?"
+python run.py qa 20261127T104512_shop
 ```

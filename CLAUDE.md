@@ -54,10 +54,10 @@ python run.py start
 python run.py --conn sqlite_sample
 ```
 
-### 3. List and Add Connections
+### 4. Interactive NLP Q&A (Specific Run ID or Latest)
 ```bash
-python run.py --list-conns
-python run.py --add-conn my_postgres "postgresql://user:pass@localhost:5432/mydb" public "Production Postgres"
+python run.py qa 20261127T104512_shop
+python run.py ask 20261127T104512_shop "Show all data quality violations"
 ```
 
 ### 4. Load in Claude Code

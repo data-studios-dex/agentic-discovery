@@ -42,7 +42,10 @@ class DiscoveryQAEngine:
     def answer_question(self, question: str) -> str:
         """Answers a user's natural language question based on the latest run telemetry."""
         if not self.run_id or not self.state_data:
-            return "No previous pipeline runs found to analyze. Please run the discovery pipeline first via `python run.py start`."
+            from .state import StateManager
+            available = [r["run_id"] for r in StateManager.list_runs(self.base_dir)]
+            avail_str = f" Available runs: {', '.join(available)}" if available else " No runs recorded yet."
+            return f"Run ID '{self.run_id}' was not found or has no state.json.{avail_str}\nPlease check the Run ID or run discovery first via `python run.py start`."
 
         # If LLM is available in api or managed mode, use Claude reasoning
         if self.llm.mode in ("api", "managed"):
