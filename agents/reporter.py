@@ -17,6 +17,7 @@ from .base import Agent
 
 class ReporterAgent(Agent):
     name = "governance_reporter"
+    managed_agent_name = "DA_CL_Discovery_GovernanceReporterAgent"
     skill_name = "governance_reporter"
 
     def compile_reports(self,

@@ -11,6 +11,7 @@ from .base import Agent
 
 class QueryFixerAgent(Agent):
     name = "query_fixer"
+    managed_agent_name = "DA_CL_Discovery_SqlValidatorFixerAgent"
     skill_name = "sql_validator_fixer"
 
     def repair_query(self, sql: str, error_message: str) -> str:

@@ -31,7 +31,14 @@ This plugin runs **purely native without requiring an external MCP server**:
 - Subagents in [`agents/*.md`](agents/) execute directly within Claude Code.
 - Skills in [`skills/*/SKILL.md`](skills/) adhere to the Anthropic Agent Skills standard.
 - Slash commands in [`commands/*.md`](commands/) provide instant developer shortcuts (`/agentic-discovery:start`, `/agentic-discovery:list-connections`, etc.).
-- Control Plane registry in [`managed_agents.json`](managed_agents.json) tracks provisioned Claude Managed Agents.
+- Control Plane registry in [`managed_agents.json`](managed_agents.json) tracks provisioned Claude Managed Agents following the enterprise naming convention `DA_CL_{UseCase}_{AgentName}`:
+  - `DA_CL_Discovery_DiscoveryOrchestratorAgent`
+  - `DA_CL_Discovery_DbDiscoveryAgent`
+  - `DA_CL_Discovery_SqlProfilerAgent`
+  - `DA_CL_Discovery_SqlValidatorFixerAgent`
+  - `DA_CL_Discovery_DqRuleGenAgent`
+  - `DA_CL_Discovery_GovernanceReviewerAgent`
+  - `DA_CL_Discovery_GovernanceReporterAgent`
 
 ---
 

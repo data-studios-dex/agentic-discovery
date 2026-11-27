@@ -17,6 +17,7 @@ from .base import Agent
 
 class DQRuleGenAgent(Agent):
     name = "dq_rulegen"
+    managed_agent_name = "DA_CL_Discovery_DqRuleGenAgent"
     skill_name = "dq_rulegen"
 
     def generate_rules(self, table: TableMeta) -> list[DQRule]:

@@ -8,6 +8,7 @@ from core.llm import LLM
 
 class Agent:
     name = "agent"
+    managed_agent_name = "DA_CL_Discovery_Agent"
     skill_name = ""
 
     def __init__(self, db: DB, llm: LLM, audit: Audit):

@@ -13,6 +13,7 @@ from .base import Agent
 
 class DiscoveryAgent(Agent):
     name = "db_discovery"
+    managed_agent_name = "DA_CL_Discovery_DbDiscoveryAgent"
     skill_name = "db_discovery"
 
     def introspect(self, schema_name: str = "main", target_tables: list[str] = None) -> SchemaManifest:

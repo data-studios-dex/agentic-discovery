@@ -297,6 +297,21 @@ flowchart LR
    - 🔴 `DEGRADED` (Score < 70% or critical key failures)
 6. **Gate G6 (Deliverables)**: Compiles all governance assets and writes them to disk.
 
+### Managed Agents Enterprise Naming Convention
+
+All provisioned agents in `managed_agents.json` follow the standardized convention:
+`DA_CL_{UseCase}_{AgentName}`
+
+| Skill / Session | Standardized Managed Agent Identifier | Description |
+| :--- | :--- | :--- |
+| `discovery_orchestrator` | `DA_CL_Discovery_DiscoveryOrchestratorAgent` | Master hub-and-spoke pipeline orchestrator |
+| `db_discovery` | `DA_CL_Discovery_DbDiscoveryAgent` | Database engine metadata & schema introspection |
+| `sql_profiler` | `DA_CL_Discovery_SqlProfilerAgent` | Statistical data volume & distribution profiling |
+| `sql_validator_fixer` | `DA_CL_Discovery_SqlValidatorFixerAgent` | AST validation, safety checks & self-healing |
+| `dq_rulegen` | `DA_CL_Discovery_DqRuleGenAgent` | 6-dimension data quality rule synthesis |
+| `governance_reviewer` | `DA_CL_Discovery_GovernanceReviewerAgent` | Table health classification & scoring |
+| `governance_reporter` | `DA_CL_Discovery_GovernanceReporterAgent` | Multi-format reports & immutable audit trails |
+
 ---
 
 ## 6. Deliverables & Report Outputs

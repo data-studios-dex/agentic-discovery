@@ -10,6 +10,7 @@ from .base import Agent
 
 class ReviewerAgent(Agent):
     name = "governance_reviewer"
+    managed_agent_name = "DA_CL_Discovery_GovernanceReviewerAgent"
     skill_name = "governance_reviewer"
 
     def review_table_health(self, table: TableMeta, rules: list[DQRule]) -> TableHealthTriage:

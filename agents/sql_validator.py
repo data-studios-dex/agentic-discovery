@@ -15,6 +15,7 @@ DESTRUCTIVE_PATTERN = re.compile(r"\b(DROP|DELETE|TRUNCATE|ALTER|INSERT|UPDATE|G
 
 class SQLValidatorAgent(Agent):
     name = "sql_validator"
+    managed_agent_name = "DA_CL_Discovery_SqlValidatorFixerAgent"
     skill_name = "sql_validator_fixer"
 
     def validate(self, sql: str) -> tuple[bool, Optional[str]]:

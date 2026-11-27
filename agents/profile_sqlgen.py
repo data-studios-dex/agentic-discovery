@@ -11,6 +11,7 @@ from .base import Agent
 
 class SQLProfilerAgent(Agent):
     name = "sql_profiler"
+    managed_agent_name = "DA_CL_Discovery_SqlProfilerAgent"
     skill_name = "sql_profiler"
 
     def formulate_profiling(self, table: TableMeta) -> list[SQLItem]:

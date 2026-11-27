@@ -1,6 +1,8 @@
 """
 Claude Managed Agents Control Plane & Registry for agentic-discovery.
 Maps agent skills to persisted, versioned Managed Agents tracked in `managed_agents.json`.
+Enforces the enterprise naming convention: DA_CL_{UseCase}_{AgentName}
+Example: DA_CL_LakeHouse_BronzeLayerAgent -> DA_CL_Discovery_DbDiscoveryAgent
 Supports drift checking, idempotent provisioning, and isolated session execution.
 """
 from __future__ import annotations
@@ -19,16 +21,50 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 REGISTRY_FILE = Path(os.getenv("MANAGED_AGENTS_REGISTRY", str(ROOT_DIR / "managed_agents.json")))
 DEFAULT_MODEL = "claude-sonnet-5-5"
 FRAMEWORK_TAG = "agentic_discovery"
+USE_CASE = "Discovery"
 
-MANAGED_SKILLS = [
-    "discovery_orchestrator",
-    "db_discovery",
-    "sql_profiler",
-    "dq_rulegen",
-    "sql_validator_fixer",
-    "governance_reviewer",
-    "governance_reporter"
+# Enterprise Managed Agents Specification adhering to: DA_CL_{UseCase}_{AgentName}
+MANAGED_AGENTS_SPEC = [
+    {
+        "skill": "discovery_orchestrator",
+        "agent_name": f"DA_CL_{USE_CASE}_DiscoveryOrchestratorAgent",
+        "description": "Master orchestrator for database discovery, profiling, and quality governance",
+    },
+    {
+        "skill": "db_discovery",
+        "agent_name": f"DA_CL_{USE_CASE}_DbDiscoveryAgent",
+        "description": "Database schema introspection, table structures, and column discovery",
+    },
+    {
+        "skill": "sql_profiler",
+        "agent_name": f"DA_CL_{USE_CASE}_SqlProfilerAgent",
+        "description": "Non-destructive statistical profiling query formulation (volume, nulls, distincts)",
+    },
+    {
+        "skill": "sql_validator_fixer",
+        "agent_name": f"DA_CL_{USE_CASE}_SqlValidatorFixerAgent",
+        "description": "SQL query AST validation, security linting, and self-healing repair",
+    },
+    {
+        "skill": "dq_rulegen",
+        "agent_name": f"DA_CL_{USE_CASE}_DqRuleGenAgent",
+        "description": "Synthesis of 6-dimension data quality rules (Completeness, Uniqueness, Validity, Timeliness)",
+    },
+    {
+        "skill": "governance_reviewer",
+        "agent_name": f"DA_CL_{USE_CASE}_GovernanceReviewerAgent",
+        "description": "Table health triage (HEALTHY, NEEDS_ATTENTION, DEGRADED) and quality scoring",
+    },
+    {
+        "skill": "governance_reporter",
+        "agent_name": f"DA_CL_{USE_CASE}_GovernanceReporterAgent",
+        "description": "Interactive HTML dashboard, Markdown executive report, and JSONL audit trail compilation",
+    },
 ]
+
+MANAGED_SKILLS = [spec["skill"] for spec in MANAGED_AGENTS_SPEC]
+SKILL_TO_AGENT_NAME = {spec["skill"]: spec["agent_name"] for spec in MANAGED_AGENTS_SPEC}
+AGENT_NAME_TO_SKILL = {spec["agent_name"]: spec["skill"] for spec in MANAGED_AGENTS_SPEC}
 
 
 class ManagedAgentRegistry:
@@ -36,6 +72,8 @@ class ManagedAgentRegistry:
         self.path = path or REGISTRY_FILE
         self.data: dict[str, Any] = {
             "framework": FRAMEWORK_TAG,
+            "use_case": USE_CASE,
+            "naming_convention": "DA_CL_{UseCase}_{AgentName}",
             "updated_at": utcnow(),
             "agents": {}
         }
@@ -54,6 +92,8 @@ class ManagedAgentRegistry:
 
     def save(self) -> None:
         self.data["updated_at"] = utcnow()
+        self.data["use_case"] = USE_CASE
+        self.data["naming_convention"] = "DA_CL_{UseCase}_{AgentName}"
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=2)
 
@@ -61,8 +101,20 @@ class ManagedAgentRegistry:
     def ready(self) -> bool:
         return bool(self.data.get("agents"))
 
-    def get_agent(self, skill_name: str) -> Optional[dict[str, Any]]:
-        return self.data.get("agents", {}).get(skill_name)
+    def get_agent(self, identifier: str) -> Optional[dict[str, Any]]:
+        agents = self.data.get("agents", {})
+        # 1. Direct match by managed agent name (DA_CL_Discovery_DbDiscoveryAgent)
+        if identifier in agents:
+            return agents[identifier]
+        # 2. Match by skill name (db_discovery -> DA_CL_Discovery_DbDiscoveryAgent)
+        mapped_name = SKILL_TO_AGENT_NAME.get(identifier)
+        if mapped_name and mapped_name in agents:
+            return agents[mapped_name]
+        # 3. Fallback scan by skill or agent_name field
+        for name, entry in agents.items():
+            if entry.get("skill") == identifier or entry.get("agent_name") == identifier or name == identifier:
+                return entry
+        return None
 
 
 def compute_skill_hash(skill: Skill) -> str:
@@ -71,26 +123,34 @@ def compute_skill_hash(skill: Skill) -> str:
 
 
 def provision(dry_run: bool = False, model: str = DEFAULT_MODEL, registry_path: Optional[Path] = None) -> dict[str, Any]:
-    """Provisions skills into managed_agents.json."""
+    """Provisions skills into managed_agents.json adhering to DA_CL_{UseCase}_{AgentName} convention."""
     registry = ManagedAgentRegistry(registry_path)
     skills = SkillRegistry()
 
     plan = {}
-    for skill_name in MANAGED_SKILLS:
+    for spec in MANAGED_AGENTS_SPEC:
+        skill_name = spec["skill"]
+        agent_name = spec["agent_name"]
         skill = skills.get(skill_name)
         if not skill:
             continue
 
         cfg_hash = compute_skill_hash(skill)
-        existing = registry.get_agent(skill_name)
+        existing = registry.get_agent(agent_name)
 
         if existing and existing.get("config_hash") == cfg_hash:
-            plan[skill_name] = {"status": "unchanged", "agent_id": existing.get("agent_id")}
+            plan[agent_name] = {
+                "status": "unchanged",
+                "agent_name": agent_name,
+                "skill": skill_name,
+                "agent_id": existing.get("agent_id")
+            }
         else:
-            agent_id = existing.get("agent_id") if existing else f"agent_{hashlib.md5(skill_name.encode()).hexdigest()[:16]}"
+            agent_id = existing.get("agent_id") if existing else f"agent_{hashlib.md5(agent_name.encode()).hexdigest()[:16]}"
             ver = (existing.get("version", 0) + 1) if existing else 1
-            plan[skill_name] = {
+            plan[agent_name] = {
                 "status": "update" if existing else "create",
+                "agent_name": agent_name,
                 "skill": skill_name,
                 "agent_id": agent_id,
                 "version": ver,
@@ -100,9 +160,12 @@ def provision(dry_run: bool = False, model: str = DEFAULT_MODEL, registry_path: 
                 "updated_at": utcnow()
             }
             if not dry_run:
-                registry.data["agents"][skill_name] = plan[skill_name]
+                registry.data["agents"][agent_name] = plan[agent_name]
 
     if not dry_run:
+        registry.data["framework"] = FRAMEWORK_TAG
+        registry.data["use_case"] = USE_CASE
+        registry.data["naming_convention"] = "DA_CL_{UseCase}_{AgentName}"
         registry.save()
 
     return plan
@@ -114,17 +177,19 @@ def check_managed_agents(registry_path: Optional[Path] = None) -> tuple[bool, li
     skills = SkillRegistry()
     drifts = []
 
-    for skill_name in MANAGED_SKILLS:
+    for spec in MANAGED_AGENTS_SPEC:
+        skill_name = spec["skill"]
+        agent_name = spec["agent_name"]
         skill = skills.get(skill_name)
         if not skill:
-            drifts.append(f"Skill '{skill_name}' defined in MANAGED_SKILLS but missing in skills/ directory.")
+            drifts.append(f"Skill '{skill_name}' defined in MANAGED_AGENTS_SPEC but missing in skills/ directory.")
             continue
         cfg_hash = compute_skill_hash(skill)
-        entry = registry.get_agent(skill_name)
+        entry = registry.get_agent(agent_name)
         if not entry:
-            drifts.append(f"Skill '{skill_name}' has not been provisioned in managed_agents.json.")
+            drifts.append(f"Managed Agent '{agent_name}' ({skill_name}) has not been provisioned in managed_agents.json.")
         elif entry.get("config_hash") != cfg_hash:
-            drifts.append(f"Skill '{skill_name}' has drifted from registry (hash mismatch).")
+            drifts.append(f"Managed Agent '{agent_name}' ({skill_name}) has drifted from registry (hash mismatch).")
 
     return len(drifts) == 0, drifts
 
@@ -137,8 +202,8 @@ def ensure_managed_agents_provisioned(registry_path: Optional[Path] = None, mode
     registry = ManagedAgentRegistry(registry_path)
     needs_provision = not registry.ready
     if not needs_provision:
-        for skill_name in MANAGED_SKILLS:
-            if not registry.get_agent(skill_name):
+        for spec in MANAGED_AGENTS_SPEC:
+            if not registry.get_agent(spec["agent_name"]):
                 needs_provision = True
                 break
 

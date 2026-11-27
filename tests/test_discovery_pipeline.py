@@ -75,6 +75,28 @@ class TestDiscoveryPipeline(unittest.TestCase):
         self.assertGreater(summary["total_events"], 5)
         self.assertEqual(summary["gate_decisions"], 6)
 
+    def test_managed_agents_naming_convention(self):
+        from core.managed_agents import ManagedAgentRegistry, check_managed_agents, MANAGED_AGENTS_SPEC
+
+        ok, drifts = check_managed_agents()
+        self.assertTrue(ok, f"Managed agents drift detected: {drifts}")
+
+        registry = ManagedAgentRegistry()
+        for spec in MANAGED_AGENTS_SPEC:
+            agent_name = spec["agent_name"]
+            # Enforce DA_CL_{UseCase}_{AgentName}
+            self.assertTrue(agent_name.startswith("DA_CL_Discovery_"), f"Invalid prefix: {agent_name}")
+            self.assertTrue(agent_name.endswith("Agent"), f"Invalid suffix: {agent_name}")
+
+            entry = registry.get_agent(agent_name)
+            self.assertIsNotNone(entry, f"Missing managed agent entry for {agent_name}")
+            self.assertEqual(entry.get("agent_name"), agent_name)
+
+            # Test skill alias resolution
+            skill_entry = registry.get_agent(spec["skill"])
+            self.assertIsNotNone(skill_entry, f"Alias lookup failed for skill {spec['skill']}")
+            self.assertEqual(skill_entry.get("agent_name"), agent_name)
+
 
 if __name__ == "__main__":
     unittest.main()
