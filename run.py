@@ -192,6 +192,53 @@ def interactive_wizard(conn_mgr: ConnectionManager) -> tuple[str, str, list[str]
     return selected_url, selected_schema, target_tables, mode
 
 
+def run_interactive_qa_loop(qa_engine: DiscoveryQAEngine) -> None:
+    """Provides an interactive conversational NLP Q&A session on the run results."""
+    banner = (
+        "[bold #ECE8E1]💬 Interactive Governance & Data Quality Q&A Session[/bold #ECE8E1]\n"
+        "[dim]You can now ask questions about table health, violations, defects, remediation, and schema structure.\n"
+        "Examples:\n"
+        "  • 'Show all data quality violations'\n"
+        "  • 'Why is table customers NEEDS_ATTENTION?'\n"
+        "  • 'How to fix defects in table orders?'\n"
+        "  • 'Show columns and types of table products'\n"
+        "Type your question below, or press Enter / type 'exit' to finish.[/dim]"
+    )
+    if console:
+        console.print(Panel(banner, style="#D97746"))
+    else:
+        print("\n" + "=" * 65)
+        print("💬 Interactive Governance & Data Quality Q&A Session")
+        print("Ask any question about table health, violations, or remediation.")
+        print("Press Enter or type 'exit' / 'q' to finish.")
+        print("=" * 65)
+
+    while True:
+        try:
+            if console and Prompt:
+                user_q = Prompt.ask("\n[bold #D97746]❓ Ask a Question[/bold #D97746] [dim](or 'exit' to quit)[/dim]", default="")
+            else:
+                user_q = input("\n❓ Ask a Question (or 'exit' to quit): ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting Q&A session.")
+            break
+
+        if not user_q or user_q.lower() in ("exit", "quit", "q", "no", "done", "bye"):
+            if console:
+                console.print("[bold green]✔ Q&A session completed. Have a great day![/bold green]\n")
+            else:
+                print("✔ Q&A session completed.\n")
+            break
+
+        ans = qa_engine.answer_question(user_q)
+        if console:
+            console.print(Panel(ans, title=f"Q&A Analysis (Run: {qa_engine.run_id})", border_style="cyan"))
+        else:
+            print(f"\n--- Answer (Run: {qa_engine.run_id}) ---")
+            print(ans)
+            print("-" * 40)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Autonomous Database Discovery & Governance CLI")
     parser.add_argument("command", nargs="?", default=None, choices=["start", "run", "list", "add", "ask", "provision", "check", "test"], help="Command shortcut")
@@ -209,6 +256,7 @@ def main():
     parser.add_argument("--check-managed-agents", action="store_true", help="Audit drift between skills and managed_agents.json")
     parser.add_argument("--dry-run", action="store_true", help="Preview provisioning plan without saving")
     parser.add_argument("--resume", action="store_true", help="Resume from latest checkpoint")
+    parser.add_argument("--qa", action="store_true", help="Launch interactive conversational Q&A session after discovery completes")
 
     args = parser.parse_args()
 
@@ -388,7 +436,6 @@ def main():
 
             console.print(tbl)
             console.print(f"\n[bold #D97746]🌐 Interactive Claude-Themed Audit Report:[/bold #D97746] [link=file:///{reports.get('html')}]{reports.get('html')}[/link]\n")
-            console.print("[dim]💡 Tip: Ask natural language questions anytime: `python run.py ask \"Why is orders DEGRADED?\"`[/dim]\n")
         else:
             print("\n✔ Pipeline Completed Successfully (Gates G1–G6 OPEN)")
             print(f"Audit Summary: {audit_summary['total_events']} events, {audit_summary['total_violations_found']} violations found.")
@@ -397,7 +444,21 @@ def main():
                 p = Path(v)
                 size_str = f"{p.stat().st_size / 1024:.1f} KB" if p.exists() else "-"
                 print(f"  - {k.upper()} ({size_str}): {v}")
-            print("\nTip: Ask natural language questions anytime: python run.py ask \"Why is orders DEGRADED?\"\n")
+
+        # Post-completion interactive conversational NLP Q&A session
+        qa_engine = DiscoveryQAEngine(
+            base_dir=Path(args.output_dir) if args.output_dir else ROOT_DIR,
+            run_id=orchestrator.run_id,
+            llm=orchestrator.llm
+        )
+
+        if is_interactive or args.qa:
+            run_interactive_qa_loop(qa_engine)
+        else:
+            if console:
+                console.print("[dim]💡 Tip: Ask natural language questions anytime: `python run.py ask \"Why is orders DEGRADED?\"` (or run with --qa)[/dim]\n")
+            else:
+                print("\nTip: Ask natural language questions anytime: python run.py ask \"Why is orders DEGRADED?\" (or run with --qa)\n")
 
     except Exception as e:
         if console:

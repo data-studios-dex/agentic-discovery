@@ -97,6 +97,36 @@ class TestDiscoveryPipeline(unittest.TestCase):
             self.assertIsNotNone(skill_entry, f"Alias lookup failed for skill {spec['skill']}")
             self.assertEqual(skill_entry.get("agent_name"), agent_name)
 
+    def test_nlp_qa_engine(self):
+        from core.qa_engine import DiscoveryQAEngine
+        tmp_dir = Path(tempfile.mkdtemp())
+        db_url = f"sqlite:///{SAMPLE_DB_PATH}"
+
+        orchestrator = DiscoveryOrchestrator(
+            db_url=db_url,
+            base_dir=tmp_dir,
+            llm_mode="offline"
+        )
+        orchestrator.run_pipeline(schema_name="main", mode="both")
+
+        qa = DiscoveryQAEngine(base_dir=tmp_dir, run_id=orchestrator.run_id)
+
+        # 1. Test violations query
+        ans_viol = qa.answer_question("Show all data quality violations")
+        self.assertIn("Violations Detected", ans_viol)
+
+        # 2. Test remediation query
+        ans_fix = qa.answer_question("How to fix defects in table customers?")
+        self.assertIn("Recommended SQL Remediation", ans_fix)
+
+        # 3. Test schema structure query
+        ans_schema = qa.answer_question("Show structure and columns of table orders")
+        self.assertIn("Table Schema Architecture", ans_schema)
+
+        # 4. Test table health query
+        ans_health = qa.answer_question("Show me health status of all tables")
+        self.assertIn("Overall Table Health Triage", ans_health)
+
 
 if __name__ == "__main__":
     unittest.main()

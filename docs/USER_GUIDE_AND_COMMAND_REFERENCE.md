@@ -241,17 +241,26 @@ Executes discovery headless on a specific connection profile without interactive
 ---
 
 ### 5. `/agentic-discovery:ask`
-Queries the discovery telemetry context using natural language. It interrogates the generated `runs/<run_id>/state.json` and `audit.jsonl` to explain table health scores, defect details, and remediation steps.
+Queries the discovery telemetry context using natural language. It interrogates the generated `runs/<run_id>/state.json` and `audit.jsonl` to explain table health scores, defect details, schema architecture, and recommended SQL remediation scripts.
 
-- **Claude Code:**
+- **Post-Completion Live Q&A**:
+  When you execute `/agentic-discovery:start` (or `python run.py --conn <name> --qa`), the system **automatically initiates an interactive Q&A session** immediately after reports are generated. You can freely ask questions until you type `exit`.
+
+- **Claude Code Examples:**
   ```text
+  /agentic-discovery:ask Show all data quality violations
   /agentic-discovery:ask Why is the orders table marked DEGRADED?
+  /agentic-discovery:ask How to fix defects in table customers?
+  /agentic-discovery:ask Show columns and structure of table products
+  /agentic-discovery:ask Show overall table health scores
   /agentic-discovery:ask Which columns have missing null values?
-  /agentic-discovery:ask Show me data quality violations in customers table
+  /agentic-discovery:ask Where are the report files saved?
   ```
 - **Terminal CLI:**
   ```bash
-  python run.py ask "Show me health status of customers table and violations"
+  python run.py ask "Show all data quality violations"
+  python run.py ask "How to fix defects in table customers?"
+  python run.py --conn sqlite_sample --qa
   ```
 
 ---

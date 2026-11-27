@@ -17,6 +17,7 @@ Launches the interactive database discovery and quality governance wizard.
    - `Quality Checks` only
 5. Runs pipeline across Gates G1 through G6 with real-time logs.
 6. Presents full audit summary and clickable links to generated deliverables.
+7. Automatically launches an interactive conversational NLP Q&A session where you can ask about violations, defects, and remediation.
 
 ### CLI Equivalent
 ```bash
